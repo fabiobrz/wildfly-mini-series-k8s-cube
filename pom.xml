@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    JBoss, Home of Professional Open Source
+    Copyright 2015, Red Hat, Inc. and/or its affiliates, and individual
+    contributors by the @authors tag. See the copyright.txt in the
+    distribution for a full listing of individual contributors.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wildfly.examples</groupId>
+    <artifactId>getting-started</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <packaging>war</packaging>
+    <name>getting-started</name>
+    <description>Insert description for your project here.</description>
+
+    <properties>
+        <!-- Explicitly declaring the source encoding eliminates the following
+            message: -->
+        <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered
+            resources, i.e. build is platform dependent! -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- JBoss dependency versions -->
+        <version.wildfly.maven.plugin>5.1.1.Final</version.wildfly.maven.plugin>
+        <version.wildfly.bom>35.0.0.Final</version.wildfly.bom>
+
+        <!-- We don't need JUnit5, and this property is not used -->
+        <!--&lt;!&ndash;Use JUnit 5 here - the WildFly bom still brings 4.x &ndash;&gt;
+        <version.junit5>5.10.1</version.junit5>-->
+
+        <!-- other plugin versions -->
+        <version.compiler.plugin>3.13.0</version.compiler.plugin>
+        <version.failsafe.plugin>3.5.2</version.failsafe.plugin>
+        <version.war.plugin>3.4.0</version.war.plugin>
+
+        <!-- maven-compiler-plugin -->
+        <maven.compiler.release>11</maven.compiler.release>
+
+
+        <arquillian-cube.version>2.0.0.Alpha1</arquillian-cube.version>
+        <arquillian-core.version>1.8.0.Final</arquillian-core.version>
+        <junit.version>4.13.2</junit.version>
+        <slf4j.version>2.0.16</slf4j.version>
+        <fabric8.kubernetes-client.version>6.9.2</fabric8.kubernetes-client.version>
+        <undertow-core.version>1.3.33.Final</undertow-core.version>
+        <resteasy-client.version>6.2.11.Final</resteasy-client.version>
+    </properties>
+
+    <!--
+    Repositories are defined in the order that they should be used.
+    (1) Maven central, (2) JBoss community
+    By default maven central is used last, so it is redefined here to
+    force it to be used first.
+    -->
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Main Apache Maven Repository</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <releases>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Main Apache Maven Repository</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <releases>
+            </releases>
+            <snapshots>
+            </snapshots>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- The wildfly-ee BOM isn't needed, since we will not build any WildFly application, but rather use an
+           existing image on Quay.io -->
+            <!--&lt;!&ndash; JBoss distributes a complete set of Jakarta EE APIs including
+                a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or
+                a collection) of artifacts. We use this here so that we always get the correct
+                versions of artifacts (you can read this as the WildFly stack of the Jakarta EE APIs,
+                with some extras tools for your project, such as Arquillian for testing)
+            &ndash;&gt;
+            <dependency>
+                <groupId>org.wildfly.bom</groupId>
+                <artifactId>wildfly-ee</artifactId>
+                <version>${version.wildfly.bom}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>-->
+
+            <!-- Arquillian Cube still using JUnit 4 by default -->
+            <!--            &lt;!&ndash;Define the JUnit5 bom. WildFly BOM still contains JUnit4, so we have to declare a version here &ndash;&gt;-->
+            <!--            <dependency>-->
+            <!--                <groupId>org.junit</groupId>-->
+            <!--                <artifactId>junit-bom</artifactId>-->
+            <!--                <version>${version.junit5}</version>-->
+            <!--                <type>pom</type>-->
+            <!--                <scope>import</scope>-->
+            <!--            </dependency>-->
+
+            <!-- We need to lock Arquillian Cube dependencies to 2.0.0.Alpha1 -->
+            <dependency>
+                <groupId>org.arquillian.cube</groupId>
+                <artifactId>arquillian-cube-bom</artifactId>
+                <type>pom</type>
+                <scope>import</scope>
+                <version>${arquillian-cube.version}</version>
+            </dependency>
+            <!-- And Arquillian Core one to the 1.8.0. version, which is the one that Arquillian Cube 2.0.0.Alpha1 is using -->
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <type>pom</type>
+                <scope>import</scope>
+                <version>${arquillian-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-bom</artifactId>
+                <version>${slf4j-api.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- No Jakarta EE application is built, so we don't need the dependencies that WildFly is meant to provide -->
+        <!--&lt;!&ndash; Import the CDI API, we use provided scope as the API is included in WildFly &ndash;&gt;
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        &lt;!&ndash; Import the JAX-RS API, we use provided scope as the API is included in WildFly &ndash;&gt;
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>-->
+
+        <!-- Here we'll depend on arquillian-cube-kubernetes, in order to test on Kubernetes, so let's remove arquillian-cube-docker... -->
+        <!--<dependency>
+                <groupId>org.arquillian.cube</groupId>
+                <artifactId>arquillian-cube-docker</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.junit</groupId>
+                <artifactId>arquillian-junit-container</artifactId>
+                <scope>test</scope>
+            </dependency>-->
+        <!-- ... and depend on arquillian-cube-kubernetes instead, in order to test on Kubernetes. -->
+        <dependency>
+            <groupId>org.arquillian.cube</groupId>
+            <artifactId>arquillian-cube-kubernetes</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.arquillian.cube</groupId>
+            <artifactId>arquillian-cube-kubernetes-starter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+            <version>${fabric8.kubernetes-client.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>${undertow-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-standalone</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Slf4j is used by Arquillian Cube Docker -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>${resteasy-client.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--See https://issues.redhat.com/browse/WFLY-19779 and https://github.com/wildfly/quickstart/pull/957/
+            httpclient needs commons-logging yet the server uses this instead,
+            to be fully compatible on apps we need to add this dependency whenever commons-logging is needed,
+            but on testing clients like this we could use commons-logging instead
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>commons-logging-jboss-logging</artifactId>
+            <scope>test</scope>
+        </dependency>
+        -->
+
+    </dependencies>
+
+    <build>
+        <!-- deploys the quickstart on root web context -->
+        <finalName>ROOT</finalName>
+
+        <plugins>
+            <!--Configuration of the maven-compiler-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${version.compiler.plugin}</version>
+            </plugin>
+
+            <!--Build configuration for the WAR plugin: -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${version.war.plugin}</version>
+                <configuration>
+                    <!-- Jakarta EE doesn't require web.xml, Maven needs to catch up! -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.2</version>
+                <!-- No Docker resources are used in the test, so we don't need to clean up anything else -->
+                <!--&lt;!&ndash; Let's remove ./docker-build/server, too &ndash;&gt;
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.basedir}/docker-build/server</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>-->
+            </plugin>
+            <!-- Not needed here, the test relies on an existing docker image which is deployed to Quay.io -->
+            <!--&lt;!&ndash; The WildFly plugin deploys your war to a local JBoss AS container &ndash;&gt;
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${version.wildfly.maven.plugin}</version>
+                <configuration>
+                    &lt;!&ndash; We need for the server to be provisioned in ./docker-build/server, as required by the Dockerfile &ndash;&gt;
+                    <provisioningDir>${project.basedir}/docker-build/server</provisioningDir>
+                    <overwriteProvisionedServer>true</overwriteProvisionedServer>
+                    <feature-packs>
+                        <feature-pack>
+                            <location>org.wildfly:wildfly-galleon-pack:${version.wildfly.bom}</location>
+                        </feature-pack>
+                        <feature-pack>
+                            <location>org.wildfly.cloud:wildfly-cloud-galleon-pack:7.0.2.Final</location>
+                        </feature-pack>
+                    </feature-packs>
+                    <layers>
+                        &lt;!&ndash; layers may be used to customize the server to provision&ndash;&gt;
+                        <layer>cloud-server</layer>
+                    </layers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${version.failsafe.plugin}</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IT</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
