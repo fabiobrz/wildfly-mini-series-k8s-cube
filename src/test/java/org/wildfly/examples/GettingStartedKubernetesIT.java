@@ -12,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -20,7 +19,7 @@ import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Run integration tests with Arquillian!
+ * Run integration tests on Kubernetes with Arquillian Cube!
  */
 @RunWith(Arquillian.class)
 public class GettingStartedKubernetesIT {
@@ -35,7 +34,7 @@ public class GettingStartedKubernetesIT {
     private URL url;
 
     @Test
-    public void shouldFindServiceInstance() throws IOException {
+    public void shouldFindServiceInstance() {
         assertNotNull(myJaxrsAppService);
         assertNotNull(myJaxrsAppService.getSpec());
         assertNotNull(myJaxrsAppService.getSpec().getPorts());
