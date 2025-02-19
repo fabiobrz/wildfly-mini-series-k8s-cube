@@ -1,24 +1,27 @@
-
-= Testing the getting-started example on Kubernetes with https://github.com/arquillian/arquillian-cube[Arquillian Cube]!
+= Testing a WildFly application image on Kubernetes with https://github.com/arquillian/arquillian-cube[Arquillian Cube]!
 
 - The `getting-started` project is a simple Jakarta EE application with a HTTP endpoint that is running in
 https://wildfly.org[WildFly].
 - https://github.com/arquillian/arquillian-cube[Arquillian Cube] is an Arquillian extension that can be used to test
-containerized applications, either onn Docker, Kubernetes or OpenShift
+containerized applications, either on Docker, Kubernetes or OpenShift
 
-This is a variant of the https://www.wildfly.org/guides/get-started-microservices-on-kubernetes/simple-microservice-part2[WildFly Java Microservice - PART 2: Kubernetes]
-blog article and _the goal is to demonstrate how it can be easily tested on Kubernetes, thanks to
-https://github.com/arquillian/arquillian-cube[Arquillian Cube]_
+This is a variant of the
+https://www.wildfly.org/guides/get-started-microservices-on-kubernetes/simple-microservice-part2[WildFly Java
+Microservice - PART 2: Kubernetes] blog article, where a pre-built WildFly application image is used to run a
+service implemented by a Kubernetes workload.
+_The goal is to demonstrate how to automate testing such scenarios_, thanks to
+https://github.com/arquillian/arquillian-cube[Arquillian Cube].
 
 - *Sources*: the `src/test` folder contains a simple test class which is validating the response of a WildFly
-application, which is runing on Kubernetes.
+application, which is running on Kubernetes.
 
 - *Resources*: the `src/test/resources` folder contains the _kubernetes.yaml_ storing the required resources definition,
 and the _arquillian.xml_ configuration file.
 
 The POM is configured to use Arquillian Cube to test the WildFly application, but on Kubernetes!
 
-== Running the application and thee test
+
+== Running the application and the test
 
 To run the application and the test:
 
@@ -29,6 +32,7 @@ mvn clean install
 
 Arquillian Cube will deploy resources to a Kubernetes cluster, run the specified WildFly application workload, and
 execute the test.
+
 
 == Resources
 
